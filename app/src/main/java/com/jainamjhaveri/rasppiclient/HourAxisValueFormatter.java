@@ -14,10 +14,10 @@ public class HourAxisValueFormatter implements AxisValueFormatter
     private DateFormat mDataFormat;
     private Date mTime;
 
-    public HourAxisValueFormatter(long referenceTimestamp)
+    public HourAxisValueFormatter()
     {
 //        this.mDataFormat = new SimpleDateFormat("HH:mm:ss");
-        this.referenceTimestamp = referenceTimestamp;
+        this.referenceTimestamp = Globals.ref;
         this.mDataFormat = DateFormat.getTimeInstance();
         this.mTime = new Date();
     }

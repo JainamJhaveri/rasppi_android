@@ -160,7 +160,7 @@ public class GraphFragment extends Fragment {
 
         x.setLabelRotationAngle(270);
 
-        AxisValueFormatter xAxisFormatter = new HourAxisValueFormatter(ref);
+        AxisValueFormatter xAxisFormatter = new HourAxisValueFormatter();
         x.setValueFormatter(xAxisFormatter);
 
         x.setAvoidFirstLastClipping(true);
