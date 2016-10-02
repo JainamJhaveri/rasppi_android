@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_table"
+        android:icon="@drawable/table"
+        android:title="Table View"
+        app:showAsAction="always" />
+
+</menu>

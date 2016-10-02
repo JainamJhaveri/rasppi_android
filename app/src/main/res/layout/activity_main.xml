@@ -4,20 +4,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="5dp"
     android:weightSum="10"
     tools:context="com.jainamjhaveri.rasppiclient.MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="10">
+        android:layout_height="wrap_content">
 
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/chart1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+        <include layout="@layout/toolbarlayout" />
+
     </LinearLayout>
 
+
+    <LinearLayout
+        android:id="@+id/main_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+
+    </LinearLayout>
+
+    <!--TODO: Recent value should be updated in the textview-->
 
 </LinearLayout>

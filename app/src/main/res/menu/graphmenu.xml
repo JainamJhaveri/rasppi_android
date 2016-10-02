@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_graph"
+        android:icon="@drawable/graph"
+        android:title="Graph View"
+        app:showAsAction="always" />
+
+</menu>
