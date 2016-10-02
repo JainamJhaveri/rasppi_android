@@ -6,6 +6,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,14 +21,21 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.AxisValueFormatter;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 
-import static com.jainamjhaveri.rasppiclient.Globals.*;
+import java.util.ArrayList;
+
+import static com.jainamjhaveri.rasppiclient.Globals.TITLE_TABLE;
+import static com.jainamjhaveri.rasppiclient.Globals.axisLineColor;
+import static com.jainamjhaveri.rasppiclient.Globals.circleColor;
+import static com.jainamjhaveri.rasppiclient.Globals.fillColor;
+import static com.jainamjhaveri.rasppiclient.Globals.lookaheads;
+import static com.jainamjhaveri.rasppiclient.Globals.xindex;
 
 public class GraphFragment extends Fragment {
 
+    private final String TAG = this.getClass().getSimpleName();
     private static GraphFragment mGraphFragment;
-    private LineChart mChart;
+    private static LineChart mChart;
     private MyMarkerView myMarkerView;
 
     public GraphFragment() {
@@ -68,26 +76,50 @@ public class GraphFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_graph, container, false);
-        mChart = (LineChart) view.findViewById(R.id.chart1);
-        myMarkerView = new MyMarkerView(this.getContext(), R.layout.my_marker_view_layout, ref);
-        initializeChart();
+        if( savedInstanceState == null )
+        {
+            Log.e(TAG, "onCreateView: null savedInstance" );
+            mChart = (LineChart) view.findViewById(R.id.chart);
+            myMarkerView = new MyMarkerView( this.getContext(), R.layout.my_marker_view_layout );
+            initializeChart();
+        }
+
         mGraphFragment = this;
         return view;
     }
 
 
-    void addGraphEntry(float point, long timestamp) {
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        Log.e(TAG, "onViewStateRestored: " + MainActivity.getArrayList().size());
+        if( MainActivity.getArrayList().size() > 0 )
+            recreateChart();
+    }
 
+    private void recreateChart()
+    {
         LineData data = mChart.getData();
-        ILineDataSet set;
-
-        if (data.getDataSetByIndex(0) == null) {
-            set = createSet();
-            data.addDataSet(set);
+        Log.e(TAG, "recreateChart: before: "+data.getEntryCount() );
+        if(data.getEntryCount() > 0)
+        {
+            mChart.moveViewTo(data.getEntryCount() - (lookaheads + 1), 50f, YAxis.AxisDependency.LEFT);
+            return;
         }
 
-        data.addEntry(new Entry(xindex++, point), 0);
+        Log.e(TAG, "recreateChart: after: "+data.getEntryCount() );
+        ArrayList<DataPoint> arrayList = MainActivity.getArrayList();
+        if (data.getDataSetByIndex(0) == null)
+        {
+            data.addDataSet( createSet() );
+        }
+
+        for( int i=0; i<arrayList.size(); i++)
+        {
+            data.addEntry(new Entry(i, arrayList.get(i).getPoint()), 0);
+        }
 
         data.notifyDataChanged();
         mChart.notifyDataSetChanged();
@@ -95,10 +127,9 @@ public class GraphFragment extends Fragment {
 
         // this automatically refreshes the chart (calls invalidate())
         mChart.moveViewTo(data.getEntryCount() - (lookaheads + 1), 50f, YAxis.AxisDependency.LEFT);
-
     }
 
-    private LineDataSet createSet() {
+    private static LineDataSet createSet() {
 
         LineDataSet set = new LineDataSet(null, "Sensor Distance from RaspPi");
 
@@ -176,8 +207,26 @@ public class GraphFragment extends Fragment {
 
     }
 
-    static GraphFragment getGraphFragmentInstance() {
+    static GraphFragment getGraphFragmentInstance()
+    {
         return mGraphFragment;
     }
 
+    public static void updateGraph(DataPoint object)
+    {
+        LineData data = mChart.getData();
+        if (data.getDataSetByIndex(0) == null)
+        {
+            data.addDataSet( createSet() );
+        }
+
+        data.addEntry(new Entry(xindex++, object.getPoint()), 0);
+
+        data.notifyDataChanged();
+        mChart.notifyDataSetChanged();
+        mChart.setVisibleXRangeMaximum(lookaheads);
+
+        // this automatically refreshes the chart (calls invalidate())
+        mChart.moveViewTo(data.getEntryCount() - (lookaheads + 1), 50f, YAxis.AxisDependency.LEFT);
+    }
 }

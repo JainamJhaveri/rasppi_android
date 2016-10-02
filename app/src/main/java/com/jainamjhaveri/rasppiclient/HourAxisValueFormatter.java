@@ -10,14 +10,11 @@ public class HourAxisValueFormatter implements AxisValueFormatter
 {
 
     private final String TAG = this.getClass().getSimpleName();
-    private long referenceTimestamp; // reference timestamp in your data set
     private DateFormat mDataFormat;
     private Date mTime;
 
     public HourAxisValueFormatter()
     {
-//        this.mDataFormat = new SimpleDateFormat("HH:mm:ss");
-        this.referenceTimestamp = Globals.ref;
         this.mDataFormat = DateFormat.getTimeInstance();
         this.mTime = new Date();
     }
@@ -35,9 +32,8 @@ public class HourAxisValueFormatter implements AxisValueFormatter
     @Override
     public String getFormattedValue(float value, AxisBase axis)
     {
-
 //        Log.e(TAG, "getFormattedValue:: value: "+value );
-        long originalTimestamp = referenceTimestamp + (long)value * 1000;
+        long originalTimestamp = Globals.ref + (long)value * 1000;
         mTime.setTime( originalTimestamp );
         return mDataFormat.format( mTime );
     }

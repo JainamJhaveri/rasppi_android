@@ -13,4 +13,7 @@ public class Globals {
     static final long ref = System.currentTimeMillis();
     static final String TITLE_GRAPH = "Graph View";
     static final String TITLE_TABLE = "Table View";
+
+    static boolean isPreviousDataExisting = false;
+
 }

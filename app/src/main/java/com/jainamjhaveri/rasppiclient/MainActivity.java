@@ -17,7 +17,8 @@ import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import static com.jainamjhaveri.rasppiclient.Globals.TITLE_GRAPH;
 import static com.jainamjhaveri.rasppiclient.Globals.subscribeKey;
@@ -27,16 +28,21 @@ public class MainActivity extends AppCompatActivity {
 
     private final String TAG = this.getClass().getSimpleName();
     Fragment fragment;
+    private static ArrayList<DataPoint> arrayList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
-// TODO: After restarting app the data should be preserved
+
+        if( arrayList.size() == 0 )
+        {
+            initPubNubConfig();
+        }
         addInitialGraphFragment();
         initToolbar();
-        initPubNubConfig();
+
     }
 
     private void initToolbar() {
@@ -73,13 +79,14 @@ public class MainActivity extends AppCompatActivity {
             public void message(PubNub pubnub, PNMessageResult message) {
 
                 float recievedPoint = (float) message.getMessage().asDouble();
-
+                long time = System.currentTimeMillis();
                 Log.e(TAG, "message: " + recievedPoint);
 
-                // TODO: get time somehow and not from timetoken
-                GraphFragment.getGraphFragmentInstance()
-                                .addGraphEntry(recievedPoint, System.currentTimeMillis());
+                DataPoint object = new DataPoint(recievedPoint, time);
+                arrayList.add( object );
 
+                // TODO: get time somehow and not from timetoken
+                GraphFragment.updateGraph( object );
             }
 
             @Override
@@ -87,7 +94,10 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
-        pubnub.subscribe().channels(Arrays.asList("my_channel")).execute();
+        pubnub.subscribe().channels(Collections.singletonList("my_channel")).execute();
     }
 
+    public static ArrayList<DataPoint> getArrayList() {
+        return arrayList;
+    }
 }

@@ -46,13 +46,13 @@ public class TableFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        String title = null;
-        Fragment fragment = null;
+
         if( item.getItemId() == R.id.menu_graph )
         {
-            title = TITLE_GRAPH;
-            fragment = ( GraphFragment.getGraphFragmentInstance() == null ?
-                    new GraphFragment() : GraphFragment.getGraphFragmentInstance() );
+            String title = TITLE_GRAPH;
+//            Fragment fragment = ( GraphFragment.getGraphFragmentInstance() == null ?
+//                    new GraphFragment() : GraphFragment.getGraphFragmentInstance() );
+            Fragment fragment = new GraphFragment();
             getActivity().setTitle(title);
             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.main_container, fragment).commit();
         }

@@ -11,18 +11,18 @@ import com.github.mikephil.charting.highlight.Highlight;
 import java.text.DateFormat;
 import java.util.Date;
 
+import static com.jainamjhaveri.rasppiclient.Globals.ref;
+
 public class MyMarkerView extends MarkerView {
 
     private TextView tvContent;
-    private long referenceTimestamp;  // minimum timestamp in your data set
     private DateFormat mDataFormat;
     private Date mTime;
 
-    public MyMarkerView(Context context, int layoutResource, long referenceTimestamp) {
+    public MyMarkerView(Context context, int layoutResource) {
         super(context, layoutResource);
         // this markerview only displays a textview
         tvContent = (TextView) findViewById(R.id.tvContent);
-        this.referenceTimestamp = referenceTimestamp;
         this.mDataFormat = DateFormat.getDateTimeInstance();
         this.mTime = new Date();
     }
@@ -31,7 +31,7 @@ public class MyMarkerView extends MarkerView {
     // content (user-interface)
     @Override
     public void refreshContent(Entry e, Highlight highlight) {
-        long timestamp = referenceTimestamp + (long)e.getX() * 1000;
+        long timestamp = ref + (long)e.getX() * 1000;
         mTime.setTime( timestamp );
         tvContent.setText(e.getY() + " at " + mDataFormat.format( mTime ) ); // set the entry-value as the display text
     }
