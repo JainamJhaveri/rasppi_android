@@ -1,4 +1,4 @@
-package com.jainamjhaveri.rasppiclient;
+package com.jainamjhaveri.rasppiclient.Utils;
 
 public class DataPoint
 {

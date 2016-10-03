@@ -8,6 +8,9 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.WindowManager;
 
+import com.jainamjhaveri.rasppiclient.Graph.GraphFragment;
+import com.jainamjhaveri.rasppiclient.Table.TableFragment;
+import com.jainamjhaveri.rasppiclient.Utils.DataPoint;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.SubscribeCallback;
@@ -20,11 +23,14 @@ import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static com.jainamjhaveri.rasppiclient.Globals.TITLE_GRAPH;
-import static com.jainamjhaveri.rasppiclient.Globals.subscribeKey;
+import static com.jainamjhaveri.rasppiclient.Utils.Globals.IS_GRAPH_FRAGMENT;
+import static com.jainamjhaveri.rasppiclient.Utils.Globals.IS_TABLE_FRAGMENT;
+import static com.jainamjhaveri.rasppiclient.Utils.Globals.TITLE_GRAPH;
+import static com.jainamjhaveri.rasppiclient.Utils.Globals.currentFragment;
+import static com.jainamjhaveri.rasppiclient.Utils.Globals.subscribeKey;
+import static com.jainamjhaveri.rasppiclient.Utils.Globals.xindex;
 
 public class MainActivity extends AppCompatActivity {
-
 
     private final String TAG = this.getClass().getSimpleName();
     Fragment fragment;
@@ -36,10 +42,11 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
-        if( arrayList.size() == 0 )
-        {
+        if (arrayList.size() == 0) {
             initPubNubConfig();
         }
+
+        currentFragment = IS_GRAPH_FRAGMENT;
         addInitialGraphFragment();
         initToolbar();
 
@@ -51,8 +58,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addInitialGraphFragment() {
-        if (fragment == null)
-        {
+        if (fragment == null) {
             fragment = new GraphFragment();
             getSupportFragmentManager().beginTransaction().replace(R.id.main_container, fragment).commit();
         }
@@ -83,10 +89,19 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "message: " + recievedPoint);
 
                 DataPoint object = new DataPoint(recievedPoint, time);
-                arrayList.add( object );
+                arrayList.add(object);
 
-                // TODO: get time somehow and not from timetoken
-                GraphFragment.updateGraph( object );
+                // TODO: get time servertime from timetoken and convert it to IST
+
+                Log.e(TAG, "message: current fragment " +currentFragment );
+                if (currentFragment == IS_TABLE_FRAGMENT) {
+                    TableFragment.updateTable(object);
+                }
+                else if (currentFragment == IS_GRAPH_FRAGMENT) {
+                    GraphFragment.updateGraph(object);
+                }
+
+                xindex++;
             }
 
             @Override

@@ -1,4 +1,4 @@
-package com.jainamjhaveri.rasppiclient;
+package com.jainamjhaveri.rasppiclient.Graph;
 
 
 import android.content.Context;
@@ -7,24 +7,20 @@ import android.widget.TextView;
 import com.github.mikephil.charting.components.MarkerView;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.highlight.Highlight;
+import com.jainamjhaveri.rasppiclient.R;
 
-import java.text.DateFormat;
-import java.util.Date;
-
-import static com.jainamjhaveri.rasppiclient.Globals.ref;
+import static com.jainamjhaveri.rasppiclient.Utils.Globals.getTimeString;
+import static com.jainamjhaveri.rasppiclient.Utils.Globals.ref;
 
 public class MyMarkerView extends MarkerView {
 
     private TextView tvContent;
-    private DateFormat mDataFormat;
-    private Date mTime;
+
 
     public MyMarkerView(Context context, int layoutResource) {
         super(context, layoutResource);
         // this markerview only displays a textview
         tvContent = (TextView) findViewById(R.id.tvContent);
-        this.mDataFormat = DateFormat.getDateTimeInstance();
-        this.mTime = new Date();
     }
 
     // callbacks everytime the MarkerView is redrawn, can be used to update the
@@ -32,8 +28,7 @@ public class MyMarkerView extends MarkerView {
     @Override
     public void refreshContent(Entry e, Highlight highlight) {
         long timestamp = ref + (long)e.getX() * 1000;
-        mTime.setTime( timestamp );
-        tvContent.setText(e.getY() + " at " + mDataFormat.format( mTime ) ); // set the entry-value as the display text
+        tvContent.setText(e.getY() + " at " + getTimeString( timestamp ) ); // set the entry-value as the display text
     }
 
     @Override

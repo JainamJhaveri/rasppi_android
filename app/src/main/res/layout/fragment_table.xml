@@ -1,13 +1,95 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.jainamjhaveri.rasppiclient.TableFragment">
+    tools:context=".Table.TableFragment">
 
 
-    <TextView
+    <de.codecrafters.tableview.TableView
+        xmlns:table="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/tableView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        table:tableView_columnCount="2"
+        table:tableView_headerColor="@color/colorPrimary" />
 
-</FrameLayout>
+    <!--<TableLayout-->
+        <!--android:id="@+id/table_main"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
+
+        <!--<TableRow-->
+            <!--android:id="@+id/tblrow_head"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:background="@color/colorPrimary"-->
+            <!--android:padding="5dp"-->
+            <!--android:weightSum="10">-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/tv_tblrow_head_value"-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_marginRight="5dp"-->
+                <!--android:layout_weight="3"-->
+                <!--android:gravity="center"-->
+                <!--android:text="Value"-->
+                <!--android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Subtitle"-->
+                <!--android:textColor="@color/white"-->
+                <!--android:textSize="16sp"-->
+                <!--android:textStyle="bold" />-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/tv_tblrow_head_time"-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_marginRight="5dp"-->
+                <!--android:layout_weight="7"-->
+                <!--android:gravity="center"-->
+                <!--android:text="Time"-->
+                <!--android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionBar.Subtitle"-->
+                <!--android:textColor="@color/white"-->
+                <!--android:textSize="16sp"-->
+                <!--android:textStyle="bold" />-->
+
+        <!--</TableRow>-->
+
+
+        <!--<ScrollView>-->
+            <!--<TableRow-->
+                <!--android:id="@+id/single_tblrow"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:padding="5dp"-->
+                <!--android:weightSum="10">-->
+
+                <!--<TextView-->
+                    <!--android:id="@+id/single_tblvalue"-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_weight="3"-->
+                    <!--android:gravity="center"-->
+                    <!--android:text="1.234"-->
+                    <!--android:textAllCaps="true"-->
+                    <!--android:textSize="16sp"-->
+                    <!--android:textStyle="bold" />-->
+
+                <!--<TextView-->
+                    <!--android:id="@+id/single_tbltime"-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:text="Oct 20, 1985 12:14:35 AM"-->
+                    <!--android:layout_weight="7"-->
+                    <!--android:gravity="center"-->
+                    <!--android:textAllCaps="true"-->
+                    <!--android:textSize="16sp"-->
+                    <!--android:textStyle="bold" />-->
+
+            <!--</TableRow>-->
+        <!--</ScrollView>-->
+
+
+    <!--</TableLayout>-->
+
+
+</LinearLayout>

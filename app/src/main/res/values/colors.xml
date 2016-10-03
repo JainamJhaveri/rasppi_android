@@ -4,4 +4,11 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="white">#fff</color>
+    <color name="blue">#6F8CEAFF</color>
+    <color name="black">#000</color>
+    <color name="table_header_text">#6084F8</color>
+    <color name="table_data_row_even">#FFFFFF</color>
+    <color name="table_data_row_odd">#DEDEDE</color>
+    <color name="green">#55eeaa</color>
+    <color name="green300">#81C784</color>
 </resources>

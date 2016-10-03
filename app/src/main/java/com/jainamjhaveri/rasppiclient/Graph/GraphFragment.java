@@ -1,4 +1,4 @@
-package com.jainamjhaveri.rasppiclient;
+package com.jainamjhaveri.rasppiclient.Graph;
 
 
 import android.graphics.Color;
@@ -21,25 +21,31 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.AxisValueFormatter;
+import com.jainamjhaveri.rasppiclient.MainActivity;
+import com.jainamjhaveri.rasppiclient.R;
+import com.jainamjhaveri.rasppiclient.Table.TableFragment;
+import com.jainamjhaveri.rasppiclient.Utils.DataPoint;
+import com.jainamjhaveri.rasppiclient.Utils.HourAxisValueFormatter;
 
 import java.util.ArrayList;
 
-import static com.jainamjhaveri.rasppiclient.Globals.TITLE_TABLE;
-import static com.jainamjhaveri.rasppiclient.Globals.axisLineColor;
-import static com.jainamjhaveri.rasppiclient.Globals.circleColor;
-import static com.jainamjhaveri.rasppiclient.Globals.fillColor;
-import static com.jainamjhaveri.rasppiclient.Globals.lookaheads;
-import static com.jainamjhaveri.rasppiclient.Globals.xindex;
+import static com.jainamjhaveri.rasppiclient.Utils.Globals.IS_GRAPH_FRAGMENT;
+import static com.jainamjhaveri.rasppiclient.Utils.Globals.TITLE_TABLE;
+import static com.jainamjhaveri.rasppiclient.Utils.Globals.axisLineColor;
+import static com.jainamjhaveri.rasppiclient.Utils.Globals.circleColor;
+import static com.jainamjhaveri.rasppiclient.Utils.Globals.currentFragment;
+import static com.jainamjhaveri.rasppiclient.Utils.Globals.fillColor;
+import static com.jainamjhaveri.rasppiclient.Utils.Globals.lookaheads;
+import static com.jainamjhaveri.rasppiclient.Utils.Globals.xindex;
 
 public class GraphFragment extends Fragment {
 
     private final String TAG = this.getClass().getSimpleName();
-    private static GraphFragment mGraphFragment;
     private static LineChart mChart;
     private MyMarkerView myMarkerView;
 
     public GraphFragment() {
-        // Required empty public constructor
+
     }
 
 
@@ -58,14 +64,11 @@ public class GraphFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        String title = null;
-        Fragment fragment = null;
+
         if( item.getItemId() == R.id.menu_table )
         {
-            title = TITLE_TABLE;
-            fragment = ( TableFragment.getTableFragmentInstance() == null ?
-                            new TableFragment() : TableFragment.getTableFragmentInstance() );
-            getActivity().setTitle(title);
+            Fragment fragment = new TableFragment();
+            getActivity().setTitle(TITLE_TABLE);
             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.main_container, fragment).commit();
         }
 
@@ -75,18 +78,14 @@ public class GraphFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         super.onCreateView(inflater, container, savedInstanceState);
-        View view = inflater.inflate(R.layout.fragment_graph, container, false);
-        if( savedInstanceState == null )
-        {
-            Log.e(TAG, "onCreateView: null savedInstance" );
-            mChart = (LineChart) view.findViewById(R.id.chart);
-            myMarkerView = new MyMarkerView( this.getContext(), R.layout.my_marker_view_layout );
-            initializeChart();
-        }
+        currentFragment = IS_GRAPH_FRAGMENT;
 
-        mGraphFragment = this;
+        View view = inflater.inflate(R.layout.fragment_graph, container, false);
+        mChart = (LineChart) view.findViewById(R.id.chart);
+        myMarkerView = new MyMarkerView( this.getContext(), R.layout.my_marker_view_layout );
+        initializeChart();
+
         return view;
     }
 
@@ -102,14 +101,13 @@ public class GraphFragment extends Fragment {
     private void recreateChart()
     {
         LineData data = mChart.getData();
-        Log.e(TAG, "recreateChart: before: "+data.getEntryCount() );
+        Log.e(TAG, "recreateChart: dataEntryCount: "+data.getEntryCount() );
         if(data.getEntryCount() > 0)
         {
             mChart.moveViewTo(data.getEntryCount() - (lookaheads + 1), 50f, YAxis.AxisDependency.LEFT);
             return;
         }
 
-        Log.e(TAG, "recreateChart: after: "+data.getEntryCount() );
         ArrayList<DataPoint> arrayList = MainActivity.getArrayList();
         if (data.getDataSetByIndex(0) == null)
         {
@@ -194,7 +192,7 @@ public class GraphFragment extends Fragment {
         AxisValueFormatter xAxisFormatter = new HourAxisValueFormatter();
         x.setValueFormatter(xAxisFormatter);
 
-        x.setAvoidFirstLastClipping(true);
+//        x.setAvoidFirstLastClipping(true);
         mChart.getAxisRight().setEnabled(false);
 
 
@@ -207,20 +205,16 @@ public class GraphFragment extends Fragment {
 
     }
 
-    static GraphFragment getGraphFragmentInstance()
-    {
-        return mGraphFragment;
-    }
-
     public static void updateGraph(DataPoint object)
     {
+
         LineData data = mChart.getData();
         if (data.getDataSetByIndex(0) == null)
         {
             data.addDataSet( createSet() );
         }
 
-        data.addEntry(new Entry(xindex++, object.getPoint()), 0);
+        data.addEntry(new Entry(xindex, object.getPoint()), 0);
 
         data.notifyDataChanged();
         mChart.notifyDataSetChanged();
