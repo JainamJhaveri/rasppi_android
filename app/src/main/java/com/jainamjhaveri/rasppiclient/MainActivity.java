@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.e(TAG, "message: current fragment " +currentFragment );
                 if (currentFragment == IS_TABLE_FRAGMENT) {
-                    TableFragment.updateTable(object);
+                    TableFragment.getInstance().updateTable(object);
                 }
                 else if (currentFragment == IS_GRAPH_FRAGMENT) {
                     GraphFragment.updateGraph(object);

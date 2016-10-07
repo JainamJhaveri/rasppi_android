@@ -19,6 +19,8 @@ import com.jainamjhaveri.rasppiclient.R;
 import com.jainamjhaveri.rasppiclient.Utils.DataPoint;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import de.codecrafters.tableview.TableDataAdapter;
 import de.codecrafters.tableview.TableView;
@@ -31,9 +33,11 @@ import static com.jainamjhaveri.rasppiclient.Utils.Globals.currentFragment;
 
 public class TableFragment extends Fragment {
 
+    private static TableFragment mTableFragmentInstance;
     private final String TAG = this.getClass().getSimpleName();
-    private static TableView<DataPoint> tableView;
-    private static ArrayList<DataPoint> mList;
+    private static TableView tableView;
+    private static TableDataAdapter<DataPoint> adapter;
+    private static List<DataPoint> mList;
 
     public TableFragment() {
 
@@ -43,6 +47,8 @@ public class TableFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        mTableFragmentInstance = this;
     }
 
     @Override
@@ -71,7 +77,7 @@ public class TableFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_table, container, false);
 
-        tableView = (TableView<DataPoint>) view.findViewById(R.id.tableView);
+        tableView = (TableView) view.findViewById(R.id.tableView);
         tableView.setColumnWeight(0, 4);
         tableView.setColumnWeight(1, 6);
 
@@ -83,7 +89,7 @@ public class TableFragment extends Fragment {
 
         return view;
     }
-    static TableDataAdapter<DataPoint> adapter;
+
     private void initTableHeader() {
         tableView.setHeaderBackground(R.drawable.green_round);
         tableView.setHeaderAdapter(new MyTableHeaderAdapter(this.getContext()));
@@ -99,30 +105,44 @@ public class TableFragment extends Fragment {
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        Log.e(TAG, "onViewStateRestored: " + MainActivity.getArrayList().size());
-        if( MainActivity.getArrayList().size() > 0 )
+        Log.e(TAG, "onViewStateRestored tablefragment: " + mList.size()+ " " + MainActivity.getArrayList().size());
+        if( mList.size() == 0 && MainActivity.getArrayList().size() > 0 )
             reCreateTable();
     }
 
     private void reCreateTable()
     {
-        ArrayList<DataPoint> arrayList = MainActivity.getArrayList();
-        mList = null;
-        mList = new ArrayList<>();
-        for( DataPoint dp: arrayList )
-        {
-            mList.add(dp);
-        }
+        mList.addAll(MainActivity.getArrayList());
+        Collections.reverse(mList);
         adapter.notifyDataSetChanged();
         tableView.setDataAdapter(adapter);
     }
 
 
 
-    public static void updateTable(DataPoint object)
+    public void updateTable(final DataPoint object)
     {
-        mList.add(object);
-//        adapter.notifyDataSetChanged();
-//        tableView.setDataAdapter(adapter);
+        if(getActivity() == null) return;
+
+
+        getActivity().runOnUiThread(
+            new Runnable() {
+                @Override
+                public void run() {
+                    if( mList.size() == 0 && MainActivity.getArrayList().size() > 0 )
+                    {
+                        mList.addAll(MainActivity.getArrayList());
+                        Collections.reverse(mList);
+                    }
+                    mList.add(0, object);
+                    adapter.notifyDataSetChanged();
+                    tableView.setDataAdapter(adapter);
+                }
+            }
+        );
+    }
+
+    public static TableFragment getInstance() {
+        return mTableFragmentInstance;
     }
 }
