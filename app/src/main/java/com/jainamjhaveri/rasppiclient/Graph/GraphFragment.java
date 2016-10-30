@@ -90,6 +90,7 @@ public class GraphFragment extends Fragment {
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
+        if(MainActivity.getArrayList() == null) return;
         Log.e(TAG, "onViewStateRestored graphfragment: " + MainActivity.getArrayList().size());
         if( MainActivity.getArrayList().size() > 0 )
             recreateChart();

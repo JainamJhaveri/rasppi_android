@@ -156,7 +156,8 @@ public class MainActivity extends AppCompatActivity {
                     list2.add(object);
                 }
 
-                TableFragment.getInstance().updateTable(object);
+//                TableFragment.getInstance().updateTable(object);
+                TableFragment.getInstance().updateTable();
                 GraphFragment.updateGraph(object);
 
                 xindex++;
@@ -197,8 +198,9 @@ public class MainActivity extends AppCompatActivity {
             default:
                 Log.e(TAG, "onOptionsItemSelected: cant reach here");
         }
-        GraphFragment.updateSensorData();
-        TableFragment.updateSensorData();
+        if(TableFragment.getInstance() == null) return false;
+        TableFragment.getInstance().updateTable();
+//        GraphFragment.updateGraph();
         return true;
     }
 

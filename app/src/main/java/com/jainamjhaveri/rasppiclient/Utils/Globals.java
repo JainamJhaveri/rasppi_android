@@ -29,7 +29,7 @@ public class Globals {
     private static Date mTime = new Date();
     public static final String[] channelArray = {ch1, ch2};
     public static boolean isPubConfigInitialized = false;
-    public static String currentChannel = "";
+    public static String currentChannel = ch1;
 
     public static String getTimeString(long timestamp)
     {

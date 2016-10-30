@@ -22,6 +22,8 @@ import de.codecrafters.tableview.TableDataAdapter;
 import de.codecrafters.tableview.TableView;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 
+import static com.jainamjhaveri.rasppiclient.MainActivity.getArrayList;
+
 
 public class TableFragment extends Fragment {
 
@@ -30,6 +32,7 @@ public class TableFragment extends Fragment {
     private TableView<DataPoint> tableView;
     private static TableDataAdapter<DataPoint> adapter;
     private static List<DataPoint> mList;
+    private static List<List<DataPoint>> list_mList;
 
     public TableFragment() {
 
@@ -75,6 +78,7 @@ public class TableFragment extends Fragment {
         initTableRowBackground();
 
         mList = new ArrayList<>();
+        list_mList = new ArrayList<>();
         adapter = new MyTableRowAdapter(this.getContext(), mList);
 
         return view;
@@ -95,20 +99,21 @@ public class TableFragment extends Fragment {
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        Log.e(TAG, "onViewStateRestored tablefragment: " + mList.size() + " " + MainActivity.getArrayList().size());
-        if (mList.size() == 0 && MainActivity.getArrayList().size() > 0)
+        if(getArrayList() == null) return;
+        Log.e(TAG, "onViewStateRestored tablefragment: " + mList.size() + " " + getArrayList().size());
+        if (mList.size() == 0 && getArrayList().size() > 0)
             reCreateTable();
     }
 
     private void reCreateTable() {
-        mList.addAll(MainActivity.getArrayList());
+        mList.addAll(getArrayList());
         Collections.reverse(mList);
         adapter.notifyDataSetChanged();
         tableView.setDataAdapter(adapter);
     }
 
 
-    public void updateTable(final DataPoint object) {
+    public void updateTable() {
         if (getActivity() == null) return;
 
 
@@ -116,11 +121,11 @@ public class TableFragment extends Fragment {
                 new Runnable() {
                     @Override
                     public void run() {
-                        if (mList.size() == 0 && MainActivity.getArrayList().size() > 0) {
-                            mList.addAll(MainActivity.getArrayList());
+                        mList.clear();
+                        if(MainActivity.getArrayList() != null){
+                            mList.addAll(getArrayList());
                             Collections.reverse(mList);
                         }
-                        mList.add(0, object);
                         adapter.notifyDataSetChanged();
                         tableView.setDataAdapter(adapter);
                     }
@@ -132,7 +137,4 @@ public class TableFragment extends Fragment {
         return mTableFragmentInstance;
     }
 
-    public static void updateSensorData() {
-        mTableFragmentInstance.reCreateTable();
-    }
 }
