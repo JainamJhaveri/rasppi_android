@@ -17,11 +17,11 @@ import de.codecrafters.tableview.TableDataAdapter;
 
 import static com.jainamjhaveri.rasppiclient.Utils.Globals.getTimeString;
 
-public class MyTableRowAdapter extends TableDataAdapter<DataPoint> {
+class MyTableRowAdapter extends TableDataAdapter<DataPoint> {
 
     private static final int TEXT_SIZE = 15;
 
-    public MyTableRowAdapter(Context context, List<DataPoint> data)
+    MyTableRowAdapter(Context context, List<DataPoint> data)
     {
         super(context, data);
     }
@@ -58,15 +58,6 @@ public class MyTableRowAdapter extends TableDataAdapter<DataPoint> {
         textView.setTextSize(TEXT_SIZE);
         textView.setTextColor(ContextCompat.getColor(getContext(), R.color.black));
         linearLayout.addView(textView, 0);
-
-//        linearLayout.setGravity(Gravity.RIGHT);
-//        View v1 = new View(getContext());
-//        v1.setLayoutParams(new LinearLayout.LayoutParams(50, LinearLayout.LayoutParams.MATCH_PARENT));
-//        linearLayout.addView(v1, 1);
-//        View v2 = new View(getContext());
-//        v2.setLayoutParams(new LinearLayout.LayoutParams(1, LinearLayout.LayoutParams.MATCH_PARENT));
-//        v2.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.black));
-//        linearLayout.addView(v2, 2);
 
         return linearLayout;
     }

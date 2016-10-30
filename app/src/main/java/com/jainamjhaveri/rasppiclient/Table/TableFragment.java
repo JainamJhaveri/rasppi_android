@@ -7,13 +7,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.jainamjhaveri.rasppiclient.Graph.GraphFragment;
 import com.jainamjhaveri.rasppiclient.MainActivity;
 import com.jainamjhaveri.rasppiclient.R;
 import com.jainamjhaveri.rasppiclient.Utils.DataPoint;
@@ -26,16 +22,12 @@ import de.codecrafters.tableview.TableDataAdapter;
 import de.codecrafters.tableview.TableView;
 import de.codecrafters.tableview.toolkit.TableDataRowBackgroundProviders;
 
-import static com.jainamjhaveri.rasppiclient.Utils.Globals.IS_TABLE_FRAGMENT;
-import static com.jainamjhaveri.rasppiclient.Utils.Globals.TITLE_GRAPH;
-import static com.jainamjhaveri.rasppiclient.Utils.Globals.currentFragment;
-
 
 public class TableFragment extends Fragment {
 
     private static TableFragment mTableFragmentInstance;
     private final String TAG = this.getClass().getSimpleName();
-    private static TableView tableView;
+    private TableView<DataPoint> tableView;
     private static TableDataAdapter<DataPoint> adapter;
     private static List<DataPoint> mList;
 
@@ -51,33 +43,31 @@ public class TableFragment extends Fragment {
         mTableFragmentInstance = this;
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.graphmenu, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        if (item.getItemId() == R.id.menu_graph) {
-            Fragment fragment = new GraphFragment();
-            getActivity().setTitle(TITLE_GRAPH);
-            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.main_container, fragment).commit();
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        super.onCreateOptionsMenu(menu, inflater);
+//        inflater.inflate(R.menu.graphmenu, menu);
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//
+//        if (item.getItemId() == R.id.menu_graph) {
+//            Fragment fragment = new GraphFragment();
+//            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.main_container, fragment).commit();
+//        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        currentFragment = IS_TABLE_FRAGMENT;
 
         View view = inflater.inflate(R.layout.fragment_table, container, false);
 
-        tableView = (TableView) view.findViewById(R.id.tableView);
+        tableView = (TableView<DataPoint>) view.findViewById(R.id.tableView);
         tableView.setColumnWeight(0, 4);
         tableView.setColumnWeight(1, 6);
 
@@ -98,20 +88,19 @@ public class TableFragment extends Fragment {
     private void initTableRowBackground() {
         final int rowColorEven = ContextCompat.getColor(this.getContext(), R.color.table_data_row_even);
         final int rowColorOdd = ContextCompat.getColor(this.getContext(), R.color.table_data_row_odd);
-        tableView.setDataRowBackgroundProvider( TableDataRowBackgroundProviders.alternatingRowColors(rowColorEven, rowColorOdd) );
+        tableView.setDataRowBackgroundProvider(TableDataRowBackgroundProviders.alternatingRowColors(rowColorEven, rowColorOdd));
     }
 
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        Log.e(TAG, "onViewStateRestored tablefragment: " + mList.size()+ " " + MainActivity.getArrayList().size());
-        if( mList.size() == 0 && MainActivity.getArrayList().size() > 0 )
+        Log.e(TAG, "onViewStateRestored tablefragment: " + mList.size() + " " + MainActivity.getArrayList().size());
+        if (mList.size() == 0 && MainActivity.getArrayList().size() > 0)
             reCreateTable();
     }
 
-    private void reCreateTable()
-    {
+    private void reCreateTable() {
         mList.addAll(MainActivity.getArrayList());
         Collections.reverse(mList);
         adapter.notifyDataSetChanged();
@@ -119,30 +108,31 @@ public class TableFragment extends Fragment {
     }
 
 
-
-    public void updateTable(final DataPoint object)
-    {
-        if(getActivity() == null) return;
+    public void updateTable(final DataPoint object) {
+        if (getActivity() == null) return;
 
 
         getActivity().runOnUiThread(
-            new Runnable() {
-                @Override
-                public void run() {
-                    if( mList.size() == 0 && MainActivity.getArrayList().size() > 0 )
-                    {
-                        mList.addAll(MainActivity.getArrayList());
-                        Collections.reverse(mList);
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mList.size() == 0 && MainActivity.getArrayList().size() > 0) {
+                            mList.addAll(MainActivity.getArrayList());
+                            Collections.reverse(mList);
+                        }
+                        mList.add(0, object);
+                        adapter.notifyDataSetChanged();
+                        tableView.setDataAdapter(adapter);
                     }
-                    mList.add(0, object);
-                    adapter.notifyDataSetChanged();
-                    tableView.setDataAdapter(adapter);
                 }
-            }
         );
     }
 
     public static TableFragment getInstance() {
         return mTableFragmentInstance;
+    }
+
+    public static void updateSensorData() {
+        mTableFragmentInstance.reCreateTable();
     }
 }

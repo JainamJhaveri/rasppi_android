@@ -11,13 +11,10 @@ import com.jainamjhaveri.rasppiclient.R;
 
 import de.codecrafters.tableview.TableHeaderAdapter;
 
-/**
- * Created by jainu on 3/10/16.
- */
-public class MyTableHeaderAdapter extends TableHeaderAdapter {
+class MyTableHeaderAdapter extends TableHeaderAdapter {
     private static final int TEXT_SIZE = 18;
 
-    public MyTableHeaderAdapter(Context context) {
+    MyTableHeaderAdapter(Context context) {
         super(context);
     }
 

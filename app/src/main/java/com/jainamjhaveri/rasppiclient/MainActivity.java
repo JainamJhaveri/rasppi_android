@@ -1,15 +1,19 @@
 package com.jainamjhaveri.rasppiclient;
 
-
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.WindowManager;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.jainamjhaveri.rasppiclient.Graph.GraphFragment;
 import com.jainamjhaveri.rasppiclient.Table.TableFragment;
+import com.jainamjhaveri.rasppiclient.Utils.CustomViewPager;
 import com.jainamjhaveri.rasppiclient.Utils.DataPoint;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
@@ -21,35 +25,60 @@ import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.List;
 
-import static com.jainamjhaveri.rasppiclient.Utils.Globals.IS_GRAPH_FRAGMENT;
-import static com.jainamjhaveri.rasppiclient.Utils.Globals.IS_TABLE_FRAGMENT;
-import static com.jainamjhaveri.rasppiclient.Utils.Globals.TITLE_GRAPH;
-import static com.jainamjhaveri.rasppiclient.Utils.Globals.currentFragment;
+import static com.jainamjhaveri.rasppiclient.Utils.Globals.ch1;
+import static com.jainamjhaveri.rasppiclient.Utils.Globals.ch2;
+import static com.jainamjhaveri.rasppiclient.Utils.Globals.channelArray;
+import static com.jainamjhaveri.rasppiclient.Utils.Globals.currentChannel;
+import static com.jainamjhaveri.rasppiclient.Utils.Globals.isPubConfigInitialized;
 import static com.jainamjhaveri.rasppiclient.Utils.Globals.subscribeKey;
 import static com.jainamjhaveri.rasppiclient.Utils.Globals.xindex;
 
 public class MainActivity extends AppCompatActivity {
+    TabLayout tabLayout;
+    CustomViewPager viewPager;
+    MainFragmentAdapter adapter;
 
     private final String TAG = this.getClass().getSimpleName();
-    Fragment fragment;
-    private static ArrayList<DataPoint> arrayList = new ArrayList<>();
+    private static ArrayList<DataPoint> list1 = new ArrayList<>();
+    private static ArrayList<DataPoint> list2 = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
-        if (arrayList.size() == 0) {
+        if ( !isPubConfigInitialized ) {
             initPubNubConfig();
+            isPubConfigInitialized = true;
         }
 
-        currentFragment = IS_GRAPH_FRAGMENT;
-        addInitialGraphFragment();
+        getReferences();
         initToolbar();
+        setupViewPager(viewPager);
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setBackgroundColor(getResources().getColor(R.color.colorPrimary) );
+        setupTabs(tabLayout);
+    }
 
+    private void setupTabs(TabLayout tabLayout) {
+        tabLayout.getTabAt(0).setIcon(R.drawable.graph);
+        tabLayout.getTabAt(1).setIcon(R.drawable.table);
+    }
+
+    private void setupViewPager(CustomViewPager viewPager) {
+        adapter = new MainFragmentAdapter(getSupportFragmentManager());
+        adapter.addFrag(new GraphFragment(), "Graph");
+        adapter.addFrag(new TableFragment(), "Table");
+        viewPager.setAdapter(adapter);
+        viewPager.setPagingEnabled(false);
+    }
+
+    private void getReferences() {
+        tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        viewPager = (CustomViewPager) findViewById(R.id.pager);
     }
 
     private void initToolbar() {
@@ -57,12 +86,41 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
     }
 
-    private void addInitialGraphFragment() {
-        if (fragment == null) {
-            fragment = new GraphFragment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.main_container, fragment).commit();
+    private class MainFragmentAdapter extends FragmentPagerAdapter {
+        private List<Fragment> mFragmentList = new ArrayList<>();
+        private List<String> mFragmentTitleList = new ArrayList<>();
+
+        MainFragmentAdapter(FragmentManager supportFragmentManager) {
+            super(supportFragmentManager);
         }
-        setTitle(TITLE_GRAPH);
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
+
+        void addFrag(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+
+        @Override
+        public int getItemPosition(Object object) {
+            return super.getItemPosition(object);
+        }
+
+        // to display title
+//        @Override
+//        public CharSequence getPageTitle(int position) {
+//            return mFragmentTitleList.get(position);
+//        }
+
+
     }
 
     private void initPubNubConfig() {
@@ -85,21 +143,21 @@ public class MainActivity extends AppCompatActivity {
             public void message(PubNub pubnub, PNMessageResult message) {
 
                 float recievedPoint = (float) message.getMessage().asDouble();
-                long time = System.currentTimeMillis();
+                String channel = message.getChannel();
+                long time = System.currentTimeMillis();     // TODO: get time servertime from timetoken and convert it to IST
                 Log.e(TAG, "message: " + recievedPoint);
 
                 DataPoint object = new DataPoint(recievedPoint, time);
-                arrayList.add(object);
 
-                // TODO: get time servertime from timetoken and convert it to IST
+                if(channel.equals(ch1)){
+                    list1.add(object);
+                }
+                else{
+                    list2.add(object);
+                }
 
-                Log.e(TAG, "message: current fragment " +currentFragment );
-                if (currentFragment == IS_TABLE_FRAGMENT) {
-                    TableFragment.getInstance().updateTable(object);
-                }
-                else if (currentFragment == IS_GRAPH_FRAGMENT) {
-                    GraphFragment.updateGraph(object);
-                }
+                TableFragment.getInstance().updateTable(object);
+                GraphFragment.updateGraph(object);
 
                 xindex++;
             }
@@ -109,10 +167,52 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
-        pubnub.subscribe().channels(Collections.singletonList("my_channel")).execute();
+
+        pubnub.subscribe().channels(Arrays.asList(channelArray)).execute();
     }
 
-    public static ArrayList<DataPoint> getArrayList() {
-        return arrayList;
+//    @Override
+//    public void onCreateOptionsMenu(Menu menu) {
+//        super.onCreateOptionsMenu(menu, inflater);
+//        inflater.inflate(R.menu.graphmenu, menu);
+//    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.optionmenu, menu);
+        return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()){
+            case R.id.menu_sensor1:
+                currentChannel = ch1;
+                break;
+            case R.id.menu_sensor2:
+                currentChannel = ch2;
+                break;
+            default:
+                Log.e(TAG, "onOptionsItemSelected: cant reach here");
+        }
+        GraphFragment.updateSensorData();
+        TableFragment.updateSensorData();
+        return true;
+    }
+
+
+    public static ArrayList<DataPoint> getArrayList() {
+        switch (currentChannel){
+            case ch1:
+                return list1;
+            case ch2:
+                return list2;
+        }
+        System.out.println("MainAc.. getArrayList: cant reach here");
+        return null;
+    }
+
+
 }
