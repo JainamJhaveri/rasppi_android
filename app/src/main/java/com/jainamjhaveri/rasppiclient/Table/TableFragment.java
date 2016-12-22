@@ -5,12 +5,10 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.jainamjhaveri.rasppiclient.MainActivity;
 import com.jainamjhaveri.rasppiclient.R;
 import com.jainamjhaveri.rasppiclient.Utils.DataPoint;
 
@@ -32,7 +30,6 @@ public class TableFragment extends Fragment {
     private TableView<DataPoint> tableView;
     private static TableDataAdapter<DataPoint> adapter;
     private static List<DataPoint> mList;
-    private static List<List<DataPoint>> list_mList;
 
     public TableFragment() {
 
@@ -45,23 +42,6 @@ public class TableFragment extends Fragment {
 
         mTableFragmentInstance = this;
     }
-
-//    @Override
-//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        super.onCreateOptionsMenu(menu, inflater);
-//        inflater.inflate(R.menu.graphmenu, menu);
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//
-//        if (item.getItemId() == R.id.menu_graph) {
-//            Fragment fragment = new GraphFragment();
-//            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.main_container, fragment).commit();
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,7 +58,6 @@ public class TableFragment extends Fragment {
         initTableRowBackground();
 
         mList = new ArrayList<>();
-        list_mList = new ArrayList<>();
         adapter = new MyTableRowAdapter(this.getContext(), mList);
 
         return view;
@@ -99,38 +78,54 @@ public class TableFragment extends Fragment {
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        if(getArrayList() == null) return;
-        Log.e(TAG, "onViewStateRestored tablefragment: " + mList.size() + " " + getArrayList().size());
-        if (mList.size() == 0 && getArrayList().size() > 0)
-            reCreateTable();
+        if(mList.size() != 0) return;
+//        assert getArrayList()!=null;
+//        Log.e(TAG, "onViewStateRestored tablefragment: " + mList.size() + " " + getArrayList().size());
+        reCreateTable();
+
+
+//        super.onViewStateRestored(savedInstanceState);
+//        if(getArrayList() == null) return;
+//        Log.e(TAG, "onViewStateRestored tablefragment: " + mList.size() + " " + getArrayList().size());
+//        if (mList.size() == 0 && getArrayList().size() > 0)
+//            reCreateTable();
+//
     }
 
+    /**
+     * recreate table by adding the global ArrayList's content into this table's List<DataPoint>
+     */
     private void reCreateTable() {
+        if(getArrayList() == null) return;
+
         mList.addAll(getArrayList());
         Collections.reverse(mList);
         adapter.notifyDataSetChanged();
         tableView.setDataAdapter(adapter);
     }
 
-
+    /**
+     * clear the table's current data from List<DataPoint> which populates it
+     * recreate table by adding the global ArrayList's content into this table's List<DataPoint>
+     */
     public void updateTable() {
         if (getActivity() == null) return;
-
 
         getActivity().runOnUiThread(
                 new Runnable() {
                     @Override
                     public void run() {
-                        mList.clear();
-                        if(MainActivity.getArrayList() != null){
-                            mList.addAll(getArrayList());
-                            Collections.reverse(mList);
-                        }
-                        adapter.notifyDataSetChanged();
-                        tableView.setDataAdapter(adapter);
+                        clearTable();
+                        reCreateTable();
                     }
                 }
         );
+    }
+
+    private void clearTable() {
+        mList.clear();
+        adapter.notifyDataSetChanged();
+        tableView.setDataAdapter(adapter);
     }
 
     public static TableFragment getInstance() {

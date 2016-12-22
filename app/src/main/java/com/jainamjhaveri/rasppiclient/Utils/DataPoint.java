@@ -17,4 +17,9 @@ public class DataPoint
     public long getTime() {
         return time;
     }
+
+    @Override
+    public String toString() {
+        return point + ", "+time;
+    }
 }

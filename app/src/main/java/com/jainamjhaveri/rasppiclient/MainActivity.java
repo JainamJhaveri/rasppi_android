@@ -149,17 +149,24 @@ public class MainActivity extends AppCompatActivity {
 
                 DataPoint object = new DataPoint(recievedPoint, time);
 
-                if(channel.equals(ch1)){
-                    list1.add(object);
+                // adding data to corresponding list
+                ArrayList<DataPoint> list = null;
+                switch(channel){
+                    case ch1:
+                        list = list1;
+                        break;
+                    case ch2:
+                        list = list2;
+                        break;
+                    default:
+                        System.out.println("MainActivity: pubnub... Cant reach here");
+                        break;
                 }
-                else{
-                    list2.add(object);
-                }
+                assert list != null;
+                list.add(object);
 
-//                TableFragment.getInstance().updateTable(object);
                 TableFragment.getInstance().updateTable();
-                GraphFragment.updateGraph(object);
-
+                GraphFragment.getInstance().updateGraph();
                 xindex++;
             }
 
@@ -200,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if(TableFragment.getInstance() == null) return false;
         TableFragment.getInstance().updateTable();
-//        GraphFragment.updateGraph();
+        GraphFragment.getInstance().updateGraph();
         return true;
     }
 
